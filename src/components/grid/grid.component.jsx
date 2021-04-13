@@ -146,7 +146,20 @@ const Grid = () => {
       newHead.x === -1 ||
       newHead.y === -1
     ) {
-      window.alert('Game over :(\n Your score: ' + score);
+      let message;
+
+      if (score >= 70)
+        message = `you fat bastard!\nOk go do something else now, you've had enough.`;
+      else if (score <= 15) message = `. Didn't even try did you?`;
+      else if (score > 15 && score < 30)
+        message =
+          '! \nImprovements COULD be made, but hey who am I to say amirite?';
+      else if (score >= 30 && score < 45)
+        message = '!\nDid you by any chance own a Nokia at some point?';
+      else if (score >= 45 && score < 70)
+        message = `!\nHmmm... You've probably dabbled with a snake or two before.`;
+
+      window.alert(`Game over${message}\n Your score: ${score}`);
       window.location.reload();
     } else {
       snake.positions.pop();
@@ -188,7 +201,18 @@ const Grid = () => {
       clone[index].type = null;
       setCells(clone);
     }
-    setFood({ posX: getRandomPos(), posY: getRandomPos() });
+
+    let newPos = { posX: getRandomPos(), posY: getRandomPos() };
+
+    while (
+      (newPos.posX === food.posX && newPos.posY === food.posY) ||
+      snake.positions.filter(
+        (pos) => pos.x === newPos.posX && pos.y === newPos.posY
+      ).length > 0
+    ) {
+      newPos = { posX: getRandomPos(), posY: getRandomPos() };
+    }
+    setFood(newPos);
   };
 
   useEffect(() => {}, [cells]);
