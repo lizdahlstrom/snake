@@ -6,8 +6,8 @@ function App() {
   return (
     <div className='App'>
       <header className='App-header'>
-        <h1>Snake</h1>
-        <Grid/>
+        <h1 className='rainbow-text'>snake 🐍</h1>
+        <Grid />
       </header>
     </div>
   );

@@ -21,6 +21,21 @@
   color: white;
 }
 
+.rainbow-text {
+  background-image: linear-gradient(
+    to right,
+    #cc99ff,
+    rgb(156, 100, 196),
+    #a9d1f7,
+    #b4f0a7,
+    #ffffbf,
+    #ffdfbe,
+    #ffb1b0
+  );
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
 .App-link {
   color: #61dafb;
 }
