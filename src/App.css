@@ -21,6 +21,11 @@
   color: white;
 }
 
+p {
+  font-size: small;
+  color: lightgray;
+}
+
 .rainbow-text {
   background-image: linear-gradient(
     to right,
