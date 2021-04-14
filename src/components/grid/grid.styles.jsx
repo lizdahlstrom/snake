@@ -12,8 +12,8 @@ const colorScheme = {
 export const GridBox = styled.div`
   background: white;
   border-radius: 6px;
-  width: 20em;
-  height: 20em;
+  width: 17em;
+  height: 17em;
   display: grid;
   grid-template-columns: ${(props) => `repeat(${props.size}, 1fr)`};
   grid-template-rows: ${(props) => `repeat(${props.size}, 1fr)`};

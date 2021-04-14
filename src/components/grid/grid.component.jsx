@@ -218,7 +218,7 @@ const Grid = () => {
 
     if (endScore >= 75)
       message = ` snake charmer.\nOk go do something else, you've had enough.`;
-    else if (endScore <= 15) message = `. Didn't even try did you?`;
+    else if (endScore <= 15) message = `. Didn't even try, did you?`;
     else if (endScore > 15 && endScore < 30)
       message =
         '! \nImprovements COULD be made, but hey who am I to say amirite?';
