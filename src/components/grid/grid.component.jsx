@@ -1,8 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import GridCell from '../cell/gridcell.component';
 import Snake from '../snake/snake.component';
 import { GridBox } from './grid.styles';
 import DIRECTION from '../../datatypes/direction';
+import { ScoreContext } from '../../contexts/score.context';
 
 const SIZE = 16;
 
@@ -41,7 +42,7 @@ const Grid = () => {
     posY: getRandomPos(),
   });
   const [snake, setSnake] = useState(initalSnakeState);
-  const [score, setScore] = useState(0);
+  const [score, setScore] = useContext(ScoreContext);
 
   const resetGame = () => {
     setCells(generateCells());
