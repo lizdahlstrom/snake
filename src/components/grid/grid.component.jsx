@@ -16,7 +16,6 @@ const generateCells = () => {
         x,
         y,
         gridType: isEven ? 'even' : 'odd',
-        type: null,
       });
     }
   }
@@ -24,8 +23,15 @@ const generateCells = () => {
   return generatedCells;
 };
 
-const getRandomPos = () => {
-  return Math.floor(Math.random() * 16);
+const getRandomPos = () => Math.floor(Math.random() * SIZE);
+
+const initalSnakeState = {
+  positions: [
+    { x: 8, y: 8 },
+    { x: 9, y: 8 },
+  ],
+  head: { x: 7, y: 8 },
+  direction: DIRECTION.TOP,
 };
 
 const Grid = () => {
@@ -34,33 +40,16 @@ const Grid = () => {
     posX: getRandomPos(),
     posY: getRandomPos(),
   });
-  const [snake, setSnake] = useState({
-    positions: [
-      { x: 8, y: 8 },
-      { x: 9, y: 8 },
-    ],
-    head: { x: 7, y: 8 },
-    direction: DIRECTION.LEFT,
-  });
-  const [isTimerRunning, setIsTimerRunning] = useState(false);
-  let timer;
+  const [snake, setSnake] = useState(initalSnakeState);
   const [score, setScore] = useState(0);
 
   const resetGame = () => {
     setCells(generateCells());
-
-    setSnake({
-      positions: [
-        { x: 8, y: 8 },
-        { x: 9, y: 8 },
-      ],
-      head: { x: 7, y: 8 },
-      direction: DIRECTION.LEFT,
-    });
-
+    setSnake(initalSnakeState);
     repositionFood();
   };
 
+  // on load effect, event listeners
   useEffect(() => {
     const handleKeyDown = (e) => {
       switch (e.key) {
@@ -96,29 +85,24 @@ const Grid = () => {
 
   // timer used for snake movement
   useEffect(() => {
-    timer = setTimeout(() => {
-      // if food has already a position, then remove the food from the
-      // position and then set food to another random pos
-      moveSnake();
+    const timer = setTimeout(() => {
+      moveSnake(snake.direction);
     }, 200);
-    setIsTimerRunning(true);
     return () => clearTimeout(timer);
   });
 
-  const moveSnake = () => {
+  const moveSnake = (direction) => {
     let head = snake.head;
-
-    if (head.x === -1 || head.y === -1 || head.x === SIZE || head.y === SIZE)
-      return;
 
     const butt = snake.positions[snake.positions.length - 1];
     const buttIndex = cells.findIndex(
       (cell) => cell.x === butt.x && cell.y === butt.y
     );
+    cells[buttIndex].type = null;
 
-    const newHead = { x: head.x, y: head.y };
+    const newHead = { ...head };
 
-    switch (snake.direction) {
+    switch (direction) {
       case DIRECTION.TOP:
         newHead.x = head.x - 1;
         break;
@@ -146,33 +130,18 @@ const Grid = () => {
       newHead.x === -1 ||
       newHead.y === -1
     ) {
-      let message;
-
-      if (score >= 70)
-        message = `you fat bastard!\nOk go do something else now, you've had enough.`;
-      else if (score <= 15) message = `. Didn't even try did you?`;
-      else if (score > 15 && score < 30)
-        message =
-          '! \nImprovements COULD be made, but hey who am I to say amirite?';
-      else if (score >= 30 && score < 45)
-        message = '!\nDid you by any chance own a Nokia at some point?';
-      else if (score >= 45 && score < 70)
-        message = `!\nHmmm... You've probably dabbled with a snake or two before.`;
-
-      window.alert(`Game over${message}\n Your score: ${score}`);
+      window.alert(`Game over${endMessage(score)}\n Your score: ${score}`);
       window.location.reload();
     } else {
+      // remove old butt
       snake.positions.pop();
     }
 
     snake.positions.push(head);
     snake.positions.unshift(snake.positions.pop());
-
     snake.head = newHead;
 
-    const clone = [...cells];
-
-    const gridCells = clone.filter((cell) => {
+    const gridCells = cells.filter((cell) => {
       let match = snake.positions.find(
         (pos) => pos.x === cell.x && pos.x && cell.y === pos.y
       );
@@ -180,43 +149,17 @@ const Grid = () => {
     });
 
     gridCells.push(
-      clone.find((cell) => cell.x === snake.head.x && cell.y === snake.head.y)
+      cells.find((cell) => cell.x === snake.head.x && cell.y === snake.head.y)
     );
 
     gridCells.forEach((gridCell) => {
       gridCell.type = 'snake';
     });
 
-    clone[buttIndex].type = null;
-
-    setCells(clone);
+    setCells([...cells]);
   };
 
-  const repositionFood = () => {
-    if (food.posX >= 0 && food.posY >= 0) {
-      const index = cells.findIndex(
-        (cell) => cell.x === food.posX && cell.y === food.posY
-      );
-      const clone = [...cells];
-      clone[index].type = null;
-      setCells(clone);
-    }
-
-    let newPos = { posX: getRandomPos(), posY: getRandomPos() };
-
-    while (
-      (newPos.posX === food.posX && newPos.posY === food.posY) ||
-      snake.positions.filter(
-        (pos) => pos.x === newPos.posX && pos.y === newPos.posY
-      ).length > 0
-    ) {
-      newPos = { posX: getRandomPos(), posY: getRandomPos() };
-    }
-    setFood(newPos);
-  };
-
-  useEffect(() => {}, [cells]);
-
+  // Draw food on grid when position is updated
   useEffect(() => {
     const index = cells.findIndex(
       (cell) => cell.x === food.posX && cell.y === food.posY
@@ -225,6 +168,68 @@ const Grid = () => {
     clone[index].type = 'food';
     setCells(clone);
   }, [food]);
+
+  /**
+   * Place food on grid
+   */
+  const repositionFood = () => {
+    // remove existing food
+    if (food.posX >= 0 && food.posY >= 0) {
+      const index = cells.findIndex(
+        (cell) => cell.x === food.posX && cell.y === food.posY
+      );
+      cells[index].type = null;
+    }
+
+    // generate a new position for food
+    let newPos = { posX: getRandomPos(), posY: getRandomPos() };
+
+    while (isCellPopulated(newPos)) {
+      newPos = { posX: getRandomPos(), posY: getRandomPos() };
+    }
+
+    setFood(newPos);
+  };
+
+  /**
+   * Check if cell position is populated
+   *
+   * @param {Object} cell contains posX and posY props
+   * @returns {Boolean}
+   */
+  const isCellPopulated = (cell) => {
+    return (
+      (cell.posX === food.posX && cell.posY === food.posY) ||
+      snake.positions.filter(
+        (pos) => pos.x === cell.posX && pos.y === cell.posY
+      ).length > 0
+    );
+  };
+
+  /**
+   * Generates end message based on current score
+   *
+   * @param {Number} endScore
+   * @returns {String}
+   */
+  const endMessage = (endScore) => {
+    let message = '';
+
+    if (endScore >= 75)
+      message = ` snake charmer.\nOk go do something else, you've had enough.`;
+    else if (endScore <= 15) message = `. Didn't even try did you?`;
+    else if (endScore > 15 && endScore < 30)
+      message =
+        '! \nImprovements COULD be made, but hey who am I to say amirite?';
+    else if (endScore >= 30 && endScore < 45)
+      message = '!\nDid you by any chance own a Nokia at some point?';
+    else if (endScore >= 45 && endScore < 60)
+      message = `!\nYou've probably dabbled with a snake or two before. He-he.`;
+    else if (endScore >= 60 && endScore < 75)
+      message = `!\nHoly crap that's a big snake!`;
+
+    return message;
+  };
 
   return (
     <GridBox size={SIZE}>
