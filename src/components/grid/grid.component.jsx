@@ -1,6 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react';
 import GridCell from '../cell/gridcell.component';
-import Snake from '../snake/snake.component';
 import { GridBox } from './grid.styles';
 import DIRECTION from '../../datatypes/direction';
 import { ScoreContext } from '../../contexts/score.context';

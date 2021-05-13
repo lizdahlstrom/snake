@@ -1,7 +1,6 @@
 import { useContext } from 'react';
 import './App.css';
 import Grid from './components/grid/grid.component';
-import Snake from './components/snake/snake.component';
 import { ScoreContext, ScoreProvider } from './contexts/score.context';
 
 function App() {

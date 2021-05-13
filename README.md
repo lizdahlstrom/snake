@@ -1,8 +1,10 @@
 # Simple Snake game made in React
 
-Deployed version can be seen here: https://snakesnakesnaaake.netlify.app/
+Deployed version can be seen here: <https://snakesnakesnaaake.netlify.app/>
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+
+Uses styled components.
 
 ## Available Scripts
 
